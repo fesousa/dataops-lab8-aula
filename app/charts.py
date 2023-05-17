@@ -48,7 +48,6 @@ def execute_sql(client, sql_text, redshift_database, redshift_user, redshift_clu
             break
         time.sleep(0.1)
     res = client.get_statement_result(Id=q_id)
-
     return res['Records']
 
 def extract_data(res):
