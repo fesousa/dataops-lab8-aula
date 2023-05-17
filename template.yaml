@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-Description: Aplicação servelerless para entrega do data pipeline.
+Description: Aplicação servelerless para entrega do  data pipeline.
 Resources:
   # Bucket para aplicação estática com JS
   S3BucketEntrega:
