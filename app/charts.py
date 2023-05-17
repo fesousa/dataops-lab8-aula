@@ -7,7 +7,7 @@ client = boto3.client("redshift-data")
 
 def handler(event, context):
     # Nome do cluster redshift
-    redshift_cluster_id = 'dataops-cluster'
+    redshift_cluster_id = 'impacta-dataops-cluster'
     # nome do database redshift
     redshift_database = 'dev'
     # nome do usuário do database redshift
@@ -48,6 +48,7 @@ def execute_sql(client, sql_text, redshift_database, redshift_user, redshift_clu
             break
         time.sleep(0.1)
     res = client.get_statement_result(Id=q_id)
+
     return res['Records']
 
 def extract_data(res):
