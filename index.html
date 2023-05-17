@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Vacinação COVID</title>
+    <!-- Inclusão do jQuery e ECharts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.1/dist/echarts.min.js"></script>
+  </head>
+  <body>
+    <!-- divs onde serão colocadas os raficos -->
+    <div id="uf" style="width: 600px;height:400px;"></div>
+    <div id="vacinas" style="width: 600px;height:400px;"></div>
+    <div id="datas" style="width: 600px;height:900px;"></div>
+    <script type="text/javascript">
+
+      var chartUf = echarts.init(document.getElementById('uf'));
+      var chartVacinas = echarts.init(document.getElementById('vacinas'));
+      var chartDatas = echarts.init(document.getElementById('datas'));
+
+      // Executar chamada para a API
+      var data = $.ajax({
+          // trocar pela URL do API Gateway
+          url: 'https://vy9i5cjf08.execute-api.us-east-1.amazonaws.com/prod/',
+          type: 'GET',
+          dataType: 'JSON',
+          success: function(response) {
+              // grafico de UF
+              var optionUf = {
+                title: {
+                  text: 'Vacinas por UF'
+                },                
+                xAxis: {
+                  data: response['uf']['dim']
+                },
+                yAxis: {},
+                series: [
+                  {
+                    name: 'vacinas',
+                    type: 'bar',
+                    data: response['uf']['value'],
+                    label: {
+                      show: true,
+                      position: 'top'
+                    },
+                  }
+                ]
+              };              
+              chartUf.setOption(optionUf);
+              
+              // gráfico de tipo de vacinas
+              data_vacinas = []
+              for (var i = 0; i < response['vacina']['dim'].length; i++) {
+                data_vacinas.push({
+                  name: response['vacina']['dim'][i],
+                  value: response['vacina']['value'][i],
+                })
+              }
+
+              var optionVacina = {
+                title: {
+                  text: 'Vacinas por tipo'
+                },                
+                series: [
+                  {
+                    type: 'treemap',
+                    data: data_vacinas,
+                    label: {
+                      show: true,
+                      position: 'insideTopLeft',
+                      formatter: function (params) {
+                        return (params.name) + `- `+ (params.value);
+                      }
+                    },
+                  }
+                ]
+              };              
+              chartVacinas.setOption(optionVacina);
+
+              // gráfico de datas
+              data_datas = []
+              for (var i = 0; i < response['data']['dim'].length; i++) {                
+                data_datas.push([
+                  response['data']['dim'][i],
+                  response['data']['value'][i]
+                ]);
+
+              }
+
+              var max = (Math.max.apply(Math,response['data']['value']))
+              var optionData = {
+                tooltip: {
+                  position: 'top',
+                  formatter: function (p) {
+                    var format = echarts.format.formatTime('yyyy-MM-dd', p.data[0]);
+                    return format + ': ' + p.data[1];
+                  }
+                },
+                visualMap: {
+                  min: 0,
+                  max: max,
+                  calculable: true,
+                  orient: 'vertical',
+                  left: '300',
+                  top: 'center',
+                  inRange: {
+                    color: ['#F8F8FF', '#002366']
+                  },
+                },
+                calendar: [
+                  {
+                    orient: 'vertical',
+                    range: '2021',
+                    cellSize: [30, 'auto'],
+                  }
+                ],
+                series: [
+                  {
+                    type: 'heatmap',
+                    coordinateSystem: 'calendar',
+                    calendarIndex: 0,
+                    data: data_datas
+                  }
+                  
+                ]
+              };              
+              chartDatas.setOption(optionData);
+          }
+      });      
+    </script>
+  </body>
+</html>
