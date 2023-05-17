@@ -5,7 +5,12 @@ Resources:
   # Bucket para aplicação estática com JS
   S3BucketEntrega:
     Type: 'AWS::S3::Bucket'
-    Properties:     
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
       BucketName: dataops-entrega-fernandossousa # nome do bucket
       WebsiteConfiguration:
         IndexDocument: index.html # arquivo index da aplicação
